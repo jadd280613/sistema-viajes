@@ -1,0 +1,116 @@
+<div class="container">
+  <div nz-row>
+    <div nz-col nzSpan="12">
+      <h1>Sistema de viajes / Dev: Jose Domenico</h1>
+    </div>
+    <div nz-col nzSpan="12" class="align-button-create">
+      <button nz-button nzType="primary" (click)="onClickCreateTravel()">
+        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        Agregar
+      </button>
+    </div>
+  </div>
+  <div nz-row nzJustify="center">
+    <div nz-col nzSpan="24">
+      <nz-table #basicTable [nzData]="travelList" nzFrontPagination="false" nzShowPagination [nzTotal]="10">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Origen</th>
+            <th>Destino</th>
+            <th>Operador</th>
+            <th>Fecha inicio</th>
+            <th>Hora inicio</th>
+            <th>Fecha final</th>
+            <th>Hora final</th>
+            <th>Opciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of basicTable.data">
+            <td>{{ data.travelId }}</td>
+            <td>{{ data.origin }}</td>
+            <td>{{ data.destination }}</td>
+            <td>{{ data.operatorTravel }}</td>
+            <td>{{ data.startDate }}</td>
+            <td>{{ data.startTime }} hrs</td>
+            <td>{{ data.endDate }}</td>
+            <td>{{ data.endTime }} hrs</td>
+            <td>
+              <button nz-button nzType="primary" (click)="onClickEditTravel(data)">
+                <span nz-icon nzType="edit" nzTheme="outline"></span>
+                Editar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+  </div>
+  <div nz-row>
+    <div nz-col nzSpan="24">
+      <nz-modal [(nzVisible)]="isVisible" [nzTitle]="titleModal" (nzOnCancel)="handleCancel()" (nzOnOk)="submitForm()">
+        <ng-container *nzModalContent>
+          <form nz-form [formGroup]="validateForm" class="form-travels">
+            <nz-form-item class="form-item">
+              <nz-form-label nzRequired nzFor="origin">Origen</nz-form-label>
+              <nz-form-control nzErrorTip="Campo requerido">
+                <input type="text" nz-input formControlName="origin" placeholder="Origen" />
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item class="form-item">
+              <nz-form-label nzRequired nzFor="destination">Destino</nz-form-label>
+              <nz-form-control nzErrorTip="Campo requerido">
+                <input type="text" nz-input formControlName="destination" placeholder="Destino" />
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item class="form-item">
+              <nz-form-label nzRequired nzFor="operatorTravel">Operador</nz-form-label>
+              <nz-form-control nzErrorTip="Campo requerido">
+                <input type="text" nz-input formControlName="operatorTravel" placeholder="Operador" />
+              </nz-form-control>
+            </nz-form-item>
+            <nz-row>
+              <div nz-col nzSpan="12">
+                <nz-form-item class="form-item">
+                  <nz-form-label nzRequired nzFor="startDate">Fecha inicial</nz-form-label>
+                  <nz-form-control nzErrorTip="Campo requerido">
+                    <nz-date-picker formControlName="startDate" nzPlaceHolder="Fecha inicio"></nz-date-picker>
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+              <div nz-col nzSpan="12">
+                <nz-form-item class="form-item">
+                  <nz-form-label nzRequired nzFor="startTime">Hora inicio</nz-form-label>
+                  <nz-form-control nzErrorTip="Campo requerido">
+                    <nz-time-picker nzFormat="HH:mm" formControlName="startTime"
+                      nzPlaceHolder="Hora inicio"></nz-time-picker>
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+            </nz-row>
+            <nz-row>
+              <div nz-col nzSpan="12">
+                <nz-form-item class="form-item">
+                  <nz-form-label nzRequired nzFor="endDate">Fecha final</nz-form-label>
+                  <nz-form-control nzErrorTip="Campo requerido">
+                    <nz-date-picker formControlName="endDate" nzPlaceHolder="Fecha final"></nz-date-picker>
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+              <div nz-col nzSpan="12">
+                <nz-form-item class="form-item">
+                  <nz-form-label nzRequired nzFor="endTime">Hora final</nz-form-label>
+                  <nz-form-control nzErrorTip="Campo requerido">
+                    <nz-time-picker nzFormat="HH:mm" formControlName="endTime"
+                      nzPlaceHolder="Hora final"></nz-time-picker>
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+            </nz-row>
+          </form>
+        </ng-container>
+      </nz-modal>
+    </div>
+  </div>
+</div>
