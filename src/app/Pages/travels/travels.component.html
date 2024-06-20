@@ -12,7 +12,7 @@
   </div>
   <div nz-row nzJustify="center">
     <div nz-col nzSpan="24">
-      <nz-table #basicTable [nzData]="travelList" nzFrontPagination="false" nzShowPagination [nzTotal]="10">
+      <nz-table #basicTable [nzData]="travelList" nzFrontPagination="false">
         <thead>
           <tr>
             <th>ID</th>
@@ -49,7 +49,7 @@
   </div>
   <div nz-row>
     <div nz-col nzSpan="24">
-      <nz-modal [(nzVisible)]="isVisible" [nzTitle]="titleModal" (nzOnCancel)="handleCancel()" (nzOnOk)="submitForm()">
+      <nz-modal [(nzVisible)]="isVisible" [nzTitle]="titleModal" (nzOnCancel)="onCloseModal()" (nzOnOk)="onSubmitForm()">
         <ng-container *nzModalContent>
           <form nz-form [formGroup]="validateForm" class="form-travels">
             <nz-form-item class="form-item">

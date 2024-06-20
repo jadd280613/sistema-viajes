@@ -50,6 +50,12 @@ import { ToastrService } from 'ngx-toastr';
   styleUrl: './travels.component.css',
 })
 export class TravelsComponent {
+  constructor(
+    private _fb: NonNullableFormBuilder,
+    private toastr: ToastrService
+  ) {
+    this.getTravelsList();
+  }
   public get fb(): NonNullableFormBuilder {
     return this._fb;
   }
@@ -63,8 +69,6 @@ export class TravelsComponent {
   isEditing = false;
   titleModal = 'Crear Viaje';
   selectedTravelId: any = 0;
-  loading = true;
-  pageSize = 10;
 
   startTime = new Date().toUTCString();
   endTime = new Date().toUTCString();
@@ -101,59 +105,66 @@ export class TravelsComponent {
       },
     });
   }
-  submitForm(): void {
+  checkDateBefore(start: any, end: any) {
+    var mStart = moment(start);
+    var mEnd = moment(end);
+    return mStart.isBefore(mEnd);
+  }
+
+  onSubmitForm(): void {
     if (this.validateForm.valid) {
-      console.log('submit', this.validateForm.value);
-      const payload: Travel = {
-        origin: this.validateForm.value.origin || '',
-        destination: this.validateForm.value.destination || '',
-        operatorTravel: this.validateForm.value.operatorTravel || '',
-        startDate: this.validateForm.value.startDate || '',
-        startTime: this.validateForm.value.startTime || new Date(),
-        endDate: this.validateForm.value.endDate || '',
-        endTime: this.validateForm.value.endTime || new Date(),
-      };
-      if (this.isEditing) {
-        console.log('show ', this.selectedTravelId);
-        payload.travelId = this.selectedTravelId;
-        console.log('values ', payload);
-        this.travelService.updateTravel(payload).subscribe({
-          next: (data) => {
-            if (data.isSuccess) {
-              this.getTravelsList();
-              this.isVisible = false;
-              this.validateForm.reset();
-              this.showSuccess(
-                'Actualizado',
-                'Datos actualizados correctamente'
-              );
-            } else {
+      if (this.checkDateBefore(this.validateForm.value.startDate, this.validateForm.value.endDate)) {
+        const payload: Travel = {
+          origin: this.validateForm.value.origin || '',
+          destination: this.validateForm.value.destination || '',
+          operatorTravel: this.validateForm.value.operatorTravel || '',
+          startDate: this.validateForm.value.startDate || '',
+          startTime: this.validateForm.value.startTime || new Date(),
+          endDate: this.validateForm.value.endDate || '',
+          endTime: this.validateForm.value.endTime || new Date(),
+        };
+        if (this.isEditing) {
+          payload.travelId = this.selectedTravelId;
+          this.travelService.updateTravel(payload).subscribe({
+            next: (data) => {
+              if (data.isSuccess) {
+                this.getTravelsList();
+                this.onCloseModal();
+                this.validateForm.reset();
+                this.showSuccess(
+                  'Actualizado',
+                  'Datos actualizados correctamente'
+                );
+              } else {
+                this.showError('Error', 'No se pudo actualizar el viaje');
+              }
+            },
+            error: (err) => {
+              console.log(err.message);
               this.showError('Error', 'No se pudo actualizar el viaje');
-            }
-          },
-          error: (err) => {
-            console.log(err.message);
-            this.showError('Error', 'No se pudo actualizar el viaje');
-          },
-        });
-      }
-      if (!this.isEditing) {
-        this.travelService.createTravel(payload).subscribe({
-          next: (data) => {
-            if (data.isSuccess) {
-              this.getTravelsList();
-              this.isVisible = false;
-              this.validateForm.reset();
-              this.showSuccess('Creado', 'Datos guardados correctamente');
-            } else {
+            },
+          });
+        }
+        if (!this.isEditing) {
+          this.travelService.createTravel(payload).subscribe({
+            next: (data) => {
+              if (data.isSuccess) {
+                this.getTravelsList();
+                this.onCloseModal();
+                this.validateForm.reset();
+                this.showSuccess('Creado', 'Datos guardados correctamente');
+              } else {
+                this.showError('Error', 'No se pudo crear el viaje');
+              }
+            },
+            error: (err) => {
+              console.log(err.message);
               this.showError('Error', 'No se pudo crear el viaje');
-            }
-          },
-          error: (err) => {
-            console.log(err.message);
-            this.showError('Error', 'No se pudo crear el viaje');
-          },
-        });
+            },
+          });
+        }
+      } else {
+        this.showError('Error', 'La fecha final no puede ser menor a la fecha inicial');
       }
     } else {
       Object.values(this.validateForm.controls).forEach((control) => {
@@ -182,11 +193,11 @@ export class TravelsComponent {
     endTime: [new Date(), [Validators.required]],
   });
 
-  showModal(): void {
+  onShowModal(): void {
     this.isVisible = true;
   }
 
-  handleCancel(): void {
+  onCloseModal(): void {
     this.isVisible = false;
     this.validateForm.reset();
   }
@@ -194,7 +205,6 @@ export class TravelsComponent {
   onClickEditTravel(data: Travel): void {
     this.isEditing = true;
     this.selectedTravelId = data.travelId;
-    console.log('1 asigned', this.selectedTravelId);
     this.titleModal = 'Editar Viaje';
     this.validateForm.setValue({
       origin: data.origin,
@@ -207,20 +217,12 @@ export class TravelsComponent {
       endDate: moment(moment(data.endDate).format('YYYY-MM-DD')).toDate(),
       endTime: new Date(data.endDate + ' ' + data.endTime),
     });
-    this.showModal();
+    this.onShowModal();
   }
   onClickCreateTravel() {
     this.isEditing = false;
     this.titleModal = 'Crear Viaje';
     this.validateForm.reset();
-    this.showModal();
-  }
-
-  constructor(
-    private router: Router,
-    private _fb: NonNullableFormBuilder,
-    private toastr: ToastrService
-  ) {
-    this.getTravelsList();
+    this.onShowModal();
   }
 }
