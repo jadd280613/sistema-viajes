@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { TravelsService } from '../../Services/travels.service';
 import { Travel } from '../../Models/Travel';
-import { Router } from '@angular/router';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -67,6 +66,7 @@ export class TravelsComponent {
 
   isVisible = false;
   isEditing = false;
+  isLoading = false;
   titleModal = 'Crear Viaje';
   selectedTravelId: any = 0;
 
@@ -113,7 +113,12 @@ export class TravelsComponent {
 
   onSubmitForm(): void {
     if (this.validateForm.valid) {
-      if (this.checkDateBefore(this.validateForm.value.startDate, this.validateForm.value.endDate)) {
+      if (
+        this.checkDateBefore(
+          this.validateForm.value.startDate,
+          this.validateForm.value.endDate
+        )
+      ) {
         const payload: Travel = {
           origin: this.validateForm.value.origin || '',
           destination: this.validateForm.value.destination || '',
@@ -123,14 +128,13 @@ export class TravelsComponent {
           endDate: this.validateForm.value.endDate || '',
           endTime: this.validateForm.value.endTime || new Date(),
         };
+        this.isLoading = true;
         if (this.isEditing) {
           payload.travelId = this.selectedTravelId;
           this.travelService.updateTravel(payload).subscribe({
             next: (data) => {
               if (data.isSuccess) {
                 this.getTravelsList();
-                this.onCloseModal();
-                this.validateForm.reset();
                 this.showSuccess(
                   'Actualizado',
                   'Datos actualizados correctamente'
@@ -150,8 +154,6 @@ export class TravelsComponent {
             next: (data) => {
               if (data.isSuccess) {
                 this.getTravelsList();
-                this.onCloseModal();
-                this.validateForm.reset();
                 this.showSuccess('Creado', 'Datos guardados correctamente');
               } else {
                 this.showError('Error', 'No se pudo crear el viaje');
@@ -163,8 +165,16 @@ export class TravelsComponent {
             },
           });
         }
+        setTimeout(() => {
+          this.onCloseModal();
+          this.validateForm.reset();
+          this.isLoading = false;
+        }, 1000);
       } else {
-        this.showError('Error', 'La fecha final no puede ser menor a la fecha inicial');
+        this.showError(
+          'Error',
+          'La fecha final no puede ser menor a la fecha inicial'
+        );
       }
     } else {
       Object.values(this.validateForm.controls).forEach((control) => {

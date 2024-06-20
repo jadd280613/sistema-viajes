@@ -49,8 +49,10 @@
   </div>
   <div nz-row>
     <div nz-col nzSpan="24">
-      <nz-modal [(nzVisible)]="isVisible" [nzTitle]="titleModal" (nzOnCancel)="onCloseModal()" (nzOnOk)="onSubmitForm()">
-        <ng-container *nzModalContent>
+      <nz-modal [(nzVisible)]="isVisible" [nzTitle]="modalTitle" [nzContent]="modalContent" [nzFooter]="modalFooter"
+        (nzOnCancel)="onCloseModal()">
+        <ng-template #modalTitle>{{titleModal}}</ng-template>
+        <ng-template #modalContent>
           <form nz-form [formGroup]="validateForm" class="form-travels">
             <nz-form-item class="form-item">
               <nz-form-label nzRequired nzFor="origin">Origen</nz-form-label>
@@ -109,8 +111,17 @@
               </div>
             </nz-row>
           </form>
-        </ng-container>
+        </ng-template>
+        <ng-template #modalFooter>
+          <button nz-button nzType="default" (click)="onCloseModal()">Cancelar</button>
+          <button nz-button nzType="primary" (click)="onSubmitForm()" [nzLoading]="isLoading">Guardar</button>
+        </ng-template>
       </nz-modal>
+      <!-- <nz-modal [(nzVisible)]="isVisible" [nzTitle]="titleModal" (nzOnCancel)="onCloseModal()" (nzOnOk)="onSubmitForm()">
+        <ng-container *nzModalContent>
+
+        </ng-container>
+      </nz-modal> -->
     </div>
   </div>
 </div>
